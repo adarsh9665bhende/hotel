@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PDF Text Viewer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js"></script>
+</head>
+<body>
+  <input type="file" id="fileInput" accept=".pdf" onchange="handleFileSelect(event)">
+  <div id="pdfTextContent"></div>
+
+  <script>
+    async function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function (event) {
+        const typedArray = new Uint8Array(event.target.result);
+
+        try {
+          const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+          let pdfText = "";
+
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+
+            textContent.items.forEach(function (textItem) {
+              pdfText += textItem.str + " ";
+            });
+          }
+
+          document.getElementById("pdfTextContent").textContent = pdfText;
+        } catch (error) {
+          console.error("Error reading PDF:", error);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
+</body>
+</html>
