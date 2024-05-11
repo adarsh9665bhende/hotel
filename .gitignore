@@ -1,6 +1,6 @@
 # Ignore the node_modules folder and its contents
 node_modules/
-
+.env
 # Ignore specific files
 notes.js
 server1.js
